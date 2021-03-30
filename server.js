@@ -6,7 +6,7 @@ const logger = require("morgan")
 const cors = require("cors")
 const corsOptions = require("./configs/cors.js")
 
-const studentController = require("./controllers/studentController")
+const studentRouter = require("./controllers/studentController.js")
 
 app.use(express.urlencoded({extended:false}))
 app.use(cors())
@@ -20,7 +20,7 @@ app.get("/", (req,res) => {
     })
 })
 
-app.use('/students', studentController)
+app.use('/students', studentRouter)
 
 app.listen(PORT, () => {
     console.log(`Express sever listening on port ${PORT}`)
