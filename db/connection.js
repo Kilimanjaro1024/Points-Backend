@@ -1,6 +1,8 @@
+require("dotenv").config()
 const mongoose = require("mongoose")
 const DB = mongoose.connection
 const config = { useUnifiedTopology: true, useNeUrlParser: true }
+const { MONGODBURI } = process.env
 
 mongoose.connect("mongodb+srv://1207:1207@cluster0.g8p4x.mongodb.net/Test?retryWrites=true&w=majority" , config)
 
