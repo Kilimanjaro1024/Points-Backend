@@ -1,73 +1,91 @@
-const Transaction = require('../models/transactionModel')
-const User = require('../models/userModel')
+const Transaction = require("../models/transactionModel");
+const User = require("../models/userModel");
 
 User.find({}).remove(() => {
-    Transaction.find({}).remove(() => {
-        let user1 = User.create({
-            name: "clayton",
-            points: 3000
-        }).then(user => {
-            Promise.all([
-                Transaction.create({
-                    payer: "DANNON",
-                    points: 400
-                }).then(transaction => {
-                    user.transactions.push(transaction)
+  Transaction.find({}).remove(() => {
+    let user1 = User.create({
+      name: "clayton",
+    }).then((user) => {
+      Promise.all([
+        Transaction.create({
+          payer: "DANNON",
+          points: 400,
+        }).then((transaction) => {
+          user.transactions.push(transaction);
+          if (
+            user.points.some(
+              (pointPayer) => pointPayer.payer === transaction.payer
+            )
+          ) {
+            console.log("false");
+            User.findOneAndUpdate(
+              {
+                _id: user._id,
+                "points.id": user.points.findIndex((payer) => {
+                  return payer.payer === transaction.payer;
                 }),
-                Transaction.create({
-                    payer: "MILLER COORS",
-                    points: 1200
-                }).then(transaction => {
-                    user.transactions.push(transaction)
+              },
+              { $set: { "points.$.points": user.points[user.points.findIndex((payer) => {
+                return payer.payer === transaction.payer;
+              })].points + transaction.points } },
+              { new: true },
+              (err, doc) => {
+                if (err) {
+                  console.log("ERROR");
+                }
+                console.log(doc);
+              }
+            );
+          } else {
+            user.points.push({
+              payer: transaction.payer,
+              points: transaction.points,
+            });
+            console.log("true");
+            console.log("Add a new payer value");
+          }
+        }),
+        Transaction.create({
+          payer: "MILLER COORS",
+          points: 1200,
+        }).then((transaction) => {
+          user.transactions.push(transaction);
+          if (
+            user.points.some(
+              (pointPayer) => pointPayer.payer === transaction.payer
+            )
+          ) {
+            console.log("false");
+            User.findOneAndUpdate(
+              {
+                _id: user._id,
+                "points.id": user.points.findIndex((payer) => {
+                  return payer.payer === transaction.payer;
                 }),
-                Transaction.create({
-                    payer: "DANNON",
-                    points: -300
-                }).then(transaction => {
-                    user.transactions.push(transaction)
-                }),
-                Transaction.create({
-                    payer: "UNILEVER",
-                    points: 600
-                }).then(transaction => {
-                    user.transactions.push(transaction)
-                }),
-                Transaction.create({
-                    payer: "MILLER COORS",
-                    points: 1000
-                }).then(transaction => {
-                    user.transactions.push(transaction)
-                })
-            ]).then(() => {
-                user.save()
-            })
-        })
-        let user2 = User.create({
-            name: "ashlie",
-            points: 400
-        }).then(user => {
-            Promise.all([
-                Transaction.create({
-                    payer: "MILLER COORS",
-                    points: 500
-                }).then(transaction => {
-                    user.transactions.push(transaction)
-                }),
-                Transaction.create({
-                    payer: "MILLER COORS",
-                    points: -300
-                }).then(transaction => {
-                    user.transactions.push(transaction)
-                }),
-                Transaction.create({
-                    payer: "DANNON",
-                    points: 200
-                }).then(transaction => {
-                    user.transactions.push(transaction)
-                })
-            ]).then(() => {
-                user.save()
-            })
-        })
-    })
-})
+              },
+              { $set: { "points.$.points": user.points[user.points.findIndex((payer) => {
+                return payer.payer === transaction.payer;
+              })].points + transaction.points } },
+              { new: true },
+              (err, doc) => {
+                if (err) {
+                  console.log("ERROR");
+                }
+                console.log(doc);
+              }
+            );
+          } else {
+            user.points.push({
+              payer: transaction.payer,
+              points: transaction.points,
+            });
+            console.log("true");
+            console.log("Add a new payer value");
+          }
+        }),
+      ]).then(() => {
+        user.save();
+      });
+    });
+  });
+});
