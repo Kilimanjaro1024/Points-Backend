@@ -12,12 +12,17 @@ router.get("/", async (req, res) => {
 
 router.put("/payout/:id", async (req, res) => {
     const transaction = req.body
-    Transaction.create(transaction).then(() => {
-        console.log("hello")
-        User.find({}).populate("transactions").populate("points").then(allUsers => {
-            res.json(allUsers)
+    User.findById(req.params.id).then(user =>{
+        Transaction.create(transaction).then(transaction => { 
+            user.transactions.push(transaction);
+        }).then(() => {
+            console.log("hello")
+            User.find({}).populate("transactions").populate("points").then(allUsers => {
+                res.json(allUsers)
+            }).catch(err => res.json({status: 400, err: err}))
         }).catch(err => res.json({status: 400, err: err}))
-    }).catch(err => res.json({status: 400, err: err}))
+
+    })
     // Transaction.create({
     //     payer: "MILLER COORS",
     //     points: 1200,
